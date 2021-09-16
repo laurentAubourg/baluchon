@@ -6,45 +6,48 @@
 //
 
 import Foundation
-class WeatherService{
+class WeatherService:UrlSessionCancelable,UrlBuildable{
+
     //MARK : properties
     
-    
-    private var task: URLSessionDataTask?
-    private let  weatherSession : URLSession
+    var lastUrl:URL = URL(string:"http://")!
+     
+    internal var  session : URLSession
 
     //MARK : methods
-    init(weatherSession:URLSession = URLSession(configuration: .default)){
-        self.weatherSession = weatherSession
+    
+
+    init(session:URLSession = URLSession(configuration: .default)){
+        self.session = session
     }
+    
+    //MARK : - Sends a request to openWzeather then waits for its response
+    
     func getWeather(callback: @escaping( Result<WeatherResponse,NetworkError>)->Void) {
-        guard let url = URL(string: "https://api.openweathermap.org/data/2.5/group?id=5128638,2992090&units=imperial&APPID=ed85328d8805688318a5b56fffe020d0")else{
+
+        guard let url = buildUrl(baseUrl:"https://api.openweathermap.org/data/2.5/group",
+        Items:[["name":"APPID","value":""],
+               ["name":"id","value":"5128638,2992090"],
+               ["name":"units","value":"metric"],
+               ["name":"metric","value":"Celsius"]])  else{
             callback(.failure(.badUrl))
             return
+            
         }
-        task?.cancel()
-        task = weatherSession.dataTask(with: url) { (data, response, error) in
-            
-                guard let data = data, error == nil else{
-                    callback(.failure(.noData))
-                    return
-                }
-            guard let response = response as? HTTPURLResponse,response.statusCode == 200 else{
-                callback(.failure(.invalidResponse))
-                return
-            }
-            
-                guard let responseJSON = try? JSONDecoder().decode(WeatherResponse.self, from: data) else{
-                    callback(.failure(.undecodableData))
-                    return
-                }
-          
-            callback(.success(responseJSON))
-            }
-        task?.resume()
+       print (url)
+        guard lastUrl != URL(string:"http://")! else{
+            session.dataTask(with: url, callback: callback)
+            lastUrl = url
+            return
+        }
+        cancel(lastUrl)
+        lastUrl = url
+        session.dataTask(with: url, callback: callback)
     }
   
 }
+//MARK: : - JSON structures decod format
+
 // MARK: - Weather Structure
 struct WeatherResponse: Decodable {
     let cnt: Int
@@ -73,3 +76,4 @@ struct Weather: Decodable {
            case icon
     }
 }
+

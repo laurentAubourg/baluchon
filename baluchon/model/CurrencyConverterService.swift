@@ -9,52 +9,38 @@ import Foundation
 enum NetworkError:Error{
     case badUrl,noData, invalidResponse,undecodableData
 }
-class CurrencyConverterService{
-    
- 
+class CurrencyConverterService:UrlSessionCancelable,
+                               UrlBuildable{
     
     //MARK : properties
-    
-    
-    private var task: URLSessionDataTask?
-    private let  rateSession : URLSession
+    var baseUrl = "http://data.fixer.io/api/latest"
+    var queryItem = [["name":"access_key","value":""],            ["name":"symbols","value":"USD,EUR"]]
+    var lastUrl:URL = URL(string:"http://")!
+     
+    internal var  session : URLSession
 
     //MARK : methods
     
 
-    init(rateSession:URLSession = URLSession(configuration: .default)){
-        self.rateSession = rateSession
+    init(session:URLSession = URLSession(configuration: .default)){
+        self.session = session
     }
+    
    // MARK: - Request exchange rate from API
+     
     func getRate(callback: @escaping( Result<FixerResponse,NetworkError>)->Void) {
-        guard let url = URL(string: "http://data.fixer.io/api/latest?access_key=3c89a5b6c8681ae01f005a879bfb8509&symbols=USD,EUR")else {
+  
+        guard let url = buildUrl(baseUrl:baseUrl,Items:queryItem)  else {
             callback(.failure(.badUrl))
             return
             
         }
-        task?.cancel()
-        task = rateSession.dataTask(with: url) { (data, response, error) in
-            
-                guard let data = data, error == nil else{
-                    callback(.failure(.noData))
-                    return
-                }
-            guard let response = response as? HTTPURLResponse,response.statusCode == 200 else{
-                callback(.failure(.invalidResponse))
-                return
-            }
-            
-                guard let responseJSON = try? JSONDecoder().decode(FixerResponse.self, from: data) else{
-                    callback(.failure(.undecodableData))
-                    return
-                }
           
-            callback(.success(responseJSON))
-            }
-        
-        
-        task?.resume()
+      //  cancel(lastUrl)
+        lastUrl = url
+        session.dataTask(with: url, callback: callback)
     }
+   
 }
 
 // MARK: decodable struct

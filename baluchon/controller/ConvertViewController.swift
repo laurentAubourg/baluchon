@@ -10,10 +10,10 @@ import UIKit
 class ConvertViewController: UIViewController,UITextFieldDelegate {
     
     
-    @IBOutlet weak var rateLab: UILabel!
-    @IBOutlet weak var valueIn: UITextField!
+    @IBOutlet weak var rateLabel: UILabel!
+    @IBOutlet weak var valueInTextField: UITextField!
     
-    @IBOutlet weak var valueOut: UILabel!
+    @IBOutlet weak var valueOutLabel: UILabel!
     private let service:CurrencyConverterService = .init()
     
     override func viewDidLoad() {
@@ -21,7 +21,7 @@ class ConvertViewController: UIViewController,UITextFieldDelegate {
         
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    func textserviceFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         
         return true
@@ -29,18 +29,18 @@ class ConvertViewController: UIViewController,UITextFieldDelegate {
     
     
     private func update(currencyVO: FixerResponse) {
-        guard !valueIn.text!.isEmpty else{
-            self.valueOut.text = "0"
+        guard !valueInTextField.text!.isEmpty else{
+            self.valueOutLabel.text = "0"
             return
             
         }
-        guard  let  valIn = Double(valueIn.text!) else{
-            self.valueIn.text = ""
-            self.valueOut.text = "0"
+        guard  let  valIn = Double(valueInTextField.text!) else{
+            self.valueInTextField.text = ""
+            self.valueOutLabel.text = "0"
             return}
         let tempVar = Double(valIn) * currencyVO.rates.usd
-        self.rateLab.text = " Rate: \(String(currencyVO.rates.usd))"
-        self.valueOut.text = String(format: "%.2f", tempVar)
+        self.rateLabel.text = " Rate: \(String(currencyVO.rates.usd))"
+        self.valueOutLabel.text = String(format: "%.2f", tempVar)
     }
     
     private func presentAlert() {
@@ -49,19 +49,34 @@ class ConvertViewController: UIViewController,UITextFieldDelegate {
         present(alertVC, animated: true, completion: nil)
     }
     @IBAction func dismissKeyboard(_ sender: UITapGestureRecognizer) {
-        valueIn.resignFirstResponder()
+        valueInTextField.resignFirstResponder()
     }
     @IBAction func textChanged(_ sender: UITextField) {
         
+        service.getRate{  [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success( let data):
+                    print (data)
+                    self?.update(currencyVO: data)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            
+            
+        }
         service.getRate{ result in
             DispatchQueue.main.async {
                 switch result {
                 case .success( let data):
+                    print (data)
                     self.update(currencyVO: data)
                 case .failure(let error):
                     print(error)
                 }
             }
+            
             
         }
     }
