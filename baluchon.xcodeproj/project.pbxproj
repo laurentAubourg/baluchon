@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		560767A226F397EA00E370EF /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560767A126F397EA00E370EF /* TableViewCell.swift */; };
 		561AAA4D26E918B5002EB85C /* UrlSessionCancelable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561AAA4C26E918B5002EB85C /* UrlSessionCancelable.swift */; };
 		5627B5F926D5207800A24D3E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5627B5F826D5207800A24D3E /* AppDelegate.swift */; };
 		5627B5FB26D5207800A24D3E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5627B5FA26D5207800A24D3E /* SceneDelegate.swift */; };
@@ -42,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		560767A126F397EA00E370EF /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		561AAA4C26E918B5002EB85C /* UrlSessionCancelable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlSessionCancelable.swift; sourceTree = "<group>"; };
 		5627B5F526D5207800A24D3E /* baluchon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = baluchon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5627B5F826D5207800A24D3E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 				5627B60326D5207900A24D3E /* LaunchScreen.storyboard */,
 				5627B60126D5207900A24D3E /* Assets.xcassets */,
 				5627B5FE26D5207800A24D3E /* Main.storyboard */,
+				560767A126F397EA00E370EF /* TableViewCell.swift */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -303,6 +306,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				560767A226F397EA00E370EF /* TableViewCell.swift in Sources */,
 				56AA54AF26E0FB6F005CC168 /* UIView+border.swift in Sources */,
 				56AA54B126E22088005CC168 /* WeatherService.swift in Sources */,
 				5627B5F926D5207800A24D3E /* AppDelegate.swift in Sources */,

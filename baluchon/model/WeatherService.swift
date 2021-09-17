@@ -11,7 +11,8 @@ class WeatherService:UrlSessionCancelable,UrlBuildable{
     //MARK : properties
     
     var lastUrl:URL = URL(string:"http://")!
-     
+
+    var baseUrl = "https://api.openweathermap.org/data/2.5/group"
     internal var  session : URLSession
 
     //MARK : methods
@@ -24,12 +25,12 @@ class WeatherService:UrlSessionCancelable,UrlBuildable{
     //MARK : - Sends a request to openWzeather then waits for its response
     
     func getWeather(callback: @escaping( Result<WeatherResponse,NetworkError>)->Void) {
-
+        let queryItem:[[String:String]] = [["name":"APPID","value":"\(idKey)"],
+                                           ["name":"id","value":"5128638,2992090"],
+                                           ["name":"units","value":"metric"],
+                                           ["name":"metric","value":"Celsius"]]
         guard let url = buildUrl(baseUrl:"https://api.openweathermap.org/data/2.5/group",
-        Items:[["name":"APPID","value":""],
-               ["name":"id","value":"5128638,2992090"],
-               ["name":"units","value":"metric"],
-               ["name":"metric","value":"Celsius"]])  else{
+        Items:queryItem)  else{
             callback(.failure(.badUrl))
             return
             

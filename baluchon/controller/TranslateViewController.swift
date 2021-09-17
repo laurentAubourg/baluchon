@@ -7,23 +7,112 @@
 
 import UIKit
 
-class TranslateViewController: UIViewController {
-
+class TranslateViewController: UIViewController,UITextFieldDelegate {
+   
+    
+    @IBOutlet weak var toTranslatTextView: UITextView!
+    @IBOutlet weak var translationLabel: UILabel!
+    private let service:TranslatorService = .init()
+    
+    @IBOutlet weak var langageTableView: UITableView!
+    @
+    IBOutlet weak var langageChoiceButton: UIButton!
+    var languageArray :[[String:String]]{
+        service.languageArray;
+    }
+   
+    var currentLang:String{
+        get{
+        service.currentLang
+        }
+        set{
+            service.currentLang = newValue
+            langageTableView.reloadData()
+            translateTapped(nil)
+           
+        }
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+      
+        langageTableView.delegate = self
+        langageTableView.dataSource = self
+        langageTableView.allowsSelection = true
+        langageTableView.allowsSelectionDuringEditing = true
+      //testCancel()
+        
+        
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func testCancel(){
+        for  i in 1 ... 100{
+            toTranslatTextView.text = "bonjour \(i)"
+            translateTapped(nil)
+        }
     }
-    */
-
+   
+    @IBAction func dismissKeyboard(_ sender: UITapGestureRecognizer) {
+        toTranslatTextView.resignFirstResponder()
+       let tapGestureRecognizer = sender
+      
+          tapGestureRecognizer.cancelsTouchesInView = false
+        
+       
+    }
+    
+    @IBAction func translateTapped(_ sender: UIButton?) {
+        guard  let text = toTranslatTextView.text  else{ return }
+  //      testCancel()
+        service.translate(textToTranslate: text){ [weak self] result in
+            DispatchQueue.main.async { [self] in
+                switch result {
+                case .success( let data):
+                    print (data)
+                    self?.translationLabel.text = data.translations[0].text
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            
+        }
+    }
+    
+    @IBAction func languageButtonTapped(_ sender: Any) {
+        langageTableView.isHidden  = !langageTableView.isHidden
+    }
+}
+extension TranslateViewController:UITableViewDelegate {
+    
+   
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let line: [String:String] = languageArray[indexPath.row]
+        let symbol = line["short"]!
+            currentLang = symbol
+        langageTableView.isHidden = true
+        langageChoiceButton.setTitle(line["name"],for: .normal)
+    }
+}
+extension TranslateViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        languageArray.count
+    }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = langageTableView.dequeueReusableCell(withIdentifier: "cell")!
+        let line: [String:String] = languageArray[indexPath.row]
+        let symbole = line["short"]!
+     
+       if symbole == currentLang {
+        cell.imageView?.image = UIImage(named: "valid")
+       }else{
+        cell.imageView?.image = nil
+       }
+     
+        cell.textLabel?.text = line["name"]
+        
+   //  cell.langCellLabel.text = line["name"]
+        
+        return cell
+    }
+ 
 }

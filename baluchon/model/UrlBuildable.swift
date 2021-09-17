@@ -15,6 +15,12 @@ extension UrlBuildable{
       
         var  queryItems: [URLQueryItem] = []
         for item:[String:String] in Items {
+            guard item["name"] != nil  else{
+                return nil
+            }
+            guard item["value"] != nil  else{
+                return nil
+            }
             let queryItem =  URLQueryItem(name: item["name"]!, value: item["value"]!)
             queryItems.append(queryItem)
         }
