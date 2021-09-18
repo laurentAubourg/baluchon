@@ -14,7 +14,7 @@ class CurrencyConverterService:UrlSessionCancelable,
     
     //MARK : properties
     var baseUrl = "http://data.fixer.io/api/latest"
-
+ 
     
     var lastUrl:URL = URL(string:"http://")!
      

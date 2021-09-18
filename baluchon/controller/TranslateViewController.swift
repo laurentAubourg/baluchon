@@ -10,8 +10,9 @@ import UIKit
 class TranslateViewController: UIViewController,UITextFieldDelegate {
    
     
+    @IBOutlet weak var tanslateTextView: UITextView!
     @IBOutlet weak var toTranslatTextView: UITextView!
-    @IBOutlet weak var translationLabel: UILabel!
+    
     private let service:TranslatorService = .init()
     
     @IBOutlet weak var langageTableView: UITableView!
@@ -37,8 +38,7 @@ class TranslateViewController: UIViewController,UITextFieldDelegate {
       
         langageTableView.delegate = self
         langageTableView.dataSource = self
-        langageTableView.allowsSelection = true
-        langageTableView.allowsSelectionDuringEditing = true
+        currentLang = "EN-GB"
       //testCancel()
         
         
@@ -56,10 +56,12 @@ class TranslateViewController: UIViewController,UITextFieldDelegate {
        let tapGestureRecognizer = sender
       
           tapGestureRecognizer.cancelsTouchesInView = false
-        
+        hidelangageTableView()
        
     }
-    
+    func hidelangageTableView(){
+        langageTableView.isHidden = true
+    }
     @IBAction func translateTapped(_ sender: UIButton?) {
         guard  let text = toTranslatTextView.text  else{ return }
   //      testCancel()
@@ -68,7 +70,7 @@ class TranslateViewController: UIViewController,UITextFieldDelegate {
                 switch result {
                 case .success( let data):
                     print (data)
-                    self?.translationLabel.text = data.translations[0].text
+                    self?.tanslateTextView.text = data.translations[0].text
                 case .failure(let error):
                     print(error)
                 }
@@ -81,6 +83,8 @@ class TranslateViewController: UIViewController,UITextFieldDelegate {
         langageTableView.isHidden  = !langageTableView.isHidden
     }
 }
+
+//MARK : - UITableViewDelegate Extension
 extension TranslateViewController:UITableViewDelegate {
     
    
@@ -89,7 +93,7 @@ extension TranslateViewController:UITableViewDelegate {
         let line: [String:String] = languageArray[indexPath.row]
         let symbol = line["short"]!
             currentLang = symbol
-        langageTableView.isHidden = true
+        hidelangageTableView()
         langageChoiceButton.setTitle(line["name"],for: .normal)
     }
 }
