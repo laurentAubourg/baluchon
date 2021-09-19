@@ -19,7 +19,7 @@ class WeatherViewController: UIViewController {
     private let service:WeatherService = .init()
     override func viewDidLoad() {
         super.viewDidLoad()
-       
+        view.addGradient(gradientColors: [UIColor.black.cgColor,UIColor.blue.cgColor])
     }
     override func viewWillAppear(_ animated: Bool) {
         getWeather()

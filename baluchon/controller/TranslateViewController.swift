@@ -35,7 +35,8 @@ class TranslateViewController: UIViewController,UITextFieldDelegate {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-      
+        view.addGradient(gradientColors: [UIColor.black.cgColor,UIColor.blue.cgColor])
+       
         langageTableView.delegate = self
         langageTableView.dataSource = self
         currentLang = "EN-GB"

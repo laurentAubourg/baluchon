@@ -35,7 +35,7 @@ class TranslatorService:UrlSessionCancelable,UrlBuildable{
         ["name":"Spanish","short":"SP"]
     ]
     var baseUrl:String = "https://api-free.deepl.com/v2/translate"
-
+   
     var lastUrl:URL = URL(string:"http://")!
     internal var  session : URLSession
     

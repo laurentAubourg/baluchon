@@ -18,7 +18,7 @@ class ConvertViewController: UIViewController,UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.addGradient(gradientColors: [UIColor.black.cgColor,UIColor.blue.cgColor])
     }
     
     func textserviceFieldShouldReturn(_ textField: UITextField) -> Bool {

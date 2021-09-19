@@ -30,7 +30,7 @@ class CurrencyConverterService:UrlSessionCancelable,
    // MARK: - Request exchange rate from API
      
     func getRate(callback: @escaping( Result<FixerResponse,NetworkError>)->Void) {
-        var queryItem = [["name":"access_key","value":"\(idKey)"],            ["name":"symbols","value":"USD,EUR"]]
+        let queryItem = [["name":"access_key","value":"\(idKey)"],            ["name":"symbols","value":"USD,EUR"]]
         guard let url = buildUrl(baseUrl:baseUrl,Items:queryItem)  else {
             callback(.failure(.badUrl))
             return
