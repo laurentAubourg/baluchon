@@ -11,7 +11,7 @@ import Foundation
 class URLProtocolFake: URLProtocol {
     static var fakeURLs = [URL?: (data: Data?, response: HTTPURLResponse?, error: Error?)]()
 
-    // Détermine si la sous-classe du protocol peut gérer la demande spécifiée
+    //  Determines if the protocol subclass can handle the specified request
     override class func canInit(with request: URLRequest) -> Bool { true }
 
     // Renvoie une version canonique de la requête spécifiée
@@ -22,9 +22,9 @@ class URLProtocolFake: URLProtocol {
     override func startLoading() {
         if let url = request.url {
             if let (data, response, error) = URLProtocolFake.fakeURLs[url] {
-                if let responseStrong = response {
+              if let responseStrong = response {
                     client?.urlProtocol(self, didReceive: responseStrong, cacheStoragePolicy: .notAllowed)
-                }
+               }
                 if let dataStrong = data {
                     client?.urlProtocol(self, didLoad: dataStrong)
                 }

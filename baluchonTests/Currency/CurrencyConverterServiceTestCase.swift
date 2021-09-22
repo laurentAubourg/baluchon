@@ -1,15 +1,15 @@
 //
-//  translatorServiceTest.swift
+//  baluchonTests.swift
 //  baluchonTests
 //
-//  Created by laurent aubourg on 15/09/2021.
+//  Created by laurent aubourg on 25/08/2021.
 //
 
 import XCTest
 @testable import baluchon
 
-class translatorServiceTestCase: XCTestCase {
-    // MARK: - PropertiesK
+class CurrencyConverterServiceTestCase: XCTestCase {
+    // MARK: - Properties
 
     private let sessionConfiguration: URLSessionConfiguration = {
         let sessionConfiguration = URLSessionConfiguration.ephemeral
@@ -20,15 +20,15 @@ class translatorServiceTestCase: XCTestCase {
     func testGetRateShouldPostFailedCallbackError(){
         
         
-        URLProtocolFake.fakeURLs = [FakeResponseData.url: (FakeResponseData.correctData, FakeResponseData.responseKO, nil)]
+        URLProtocolFake.fakeURLs = [FakeResponseData.urlCurrency: (FakeResponseData.currencyCorrectData, FakeResponseData.currencyResponseOK, nil)]
         let fakeSession = URLSession(configuration: sessionConfiguration)
         let sut: CurrencyConverterService = .init(session: fakeSession)
         
         let expectation = XCTestExpectation(description: "Waiting...")
-        sut.getRate() { result in
+        sut.getRate{ result in
         
             guard case .failure(let error) = result else {
-              //  XCTFail("Test failed: \(#function)")
+               XCTFail("Test failed: \(#function)")
                 return
             }
             XCTAssertTrue(error == .invalidResponse)
@@ -36,6 +36,7 @@ class translatorServiceTestCase: XCTestCase {
         }
         wait(for: [expectation], timeout: 0.01)
     }
+
 
 }
 

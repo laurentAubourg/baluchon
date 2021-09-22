@@ -11,7 +11,7 @@ extension URLSession {
 
     // MARK: - Generic call
   
-    func dataTask<T: Decodable>(with  url: URL,
+    func  dataTask<T: Decodable>(with  url: URL,
                                 callback: @escaping (Result<T, NetworkError>) -> Void) {
         dataTask(with: url) { data, response, error in
             

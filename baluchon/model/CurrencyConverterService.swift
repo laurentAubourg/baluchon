@@ -14,10 +14,7 @@ class CurrencyConverterService:UrlSessionCancelable,
     
     //MARK : properties
     var baseUrl = "http://data.fixer.io/api/latest"
- 
-    
-    var lastUrl:URL = URL(string:"http://")!
-     
+    var lastUrl:URL = URL(string:"http://")!     
     internal var  session : URLSession
 
     //MARK : methods
@@ -27,10 +24,10 @@ class CurrencyConverterService:UrlSessionCancelable,
         self.session = session
     }
     
-   // MARK: - Request exchange rate from API
+   // MARK: - Request to  obtains  exchange rate from API
      
     func getRate(callback: @escaping( Result<FixerResponse,NetworkError>)->Void) {
-        let queryItem = [["name":"access_key","value":"\(idKey)"],            ["name":"symbols","value":"USD,EUR"]]
+        let queryItem = [["name":"access_key","value":"\(ApiKey.fixer)"],            ["name":"symbols","value":"USD,EUR"]]
         guard let url = buildUrl(baseUrl:baseUrl,Items:queryItem)  else {
             callback(.failure(.badUrl))
             return

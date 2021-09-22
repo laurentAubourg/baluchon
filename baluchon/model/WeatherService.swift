@@ -7,35 +7,29 @@
 
 import Foundation
 class WeatherService:UrlSessionCancelable,UrlBuildable{
-
-    //MARK : properties
+    
+    //MARK: - properties
     
     var lastUrl:URL = URL(string:"http://")!
-   
     var baseUrl = "https://api.openweathermap.org/data/2.5/group"
     internal var  session : URLSession
-
-    //MARK : methods
     
-
+    //MARK: - methods
+    
+    
     init(session:URLSession = URLSession(configuration: .default)){
         self.session = session
     }
     
-    //MARK : - Sends a request to openWzeather then waits for its response
+    //MARK: - Request to the API openWzeather then waits for its response
     
     func getWeather(callback: @escaping( Result<WeatherResponse,NetworkError>)->Void) {
-        let queryItem:[[String:String]] = [["name":"APPID","value":"\(idKey)"],
+        let queryItem:[[String:String]] = [["name":"APPID","value":"\(ApiKey.openWeather)"],
                                            ["name":"id","value":"5128638,2992090"],
                                            ["name":"units","value":"metric"],
                                            ["name":"metric","value":"Celsius"]]
-        guard let url = buildUrl(baseUrl:"https://api.openweathermap.org/data/2.5/group",
-        Items:queryItem)  else{
-            callback(.failure(.badUrl))
-            return
-            
-        }
-       print (url)
+        guard let url = buildUrl(baseUrl:baseUrl, Items:queryItem)  else{ return }
+        print (url)
         guard lastUrl != URL(string:"http://")! else{
             session.dataTask(with: url, callback: callback)
             lastUrl = url
@@ -45,11 +39,11 @@ class WeatherService:UrlSessionCancelable,UrlBuildable{
         lastUrl = url
         session.dataTask(with: url, callback: callback)
     }
-  
+    
 }
-//MARK: : - JSON structures decod format
+//MARK: - JSON structures decod format
 
-// MARK: - Weather Structure
+// MARK: - Weather Struct
 struct WeatherResponse: Decodable {
     let cnt: Int
     let list: [List]
@@ -73,8 +67,8 @@ struct Weather: Decodable {
     let weatherDescription, icon: String?
     
     enum CodingKeys: String, CodingKey {
-           case weatherDescription = "description"
-           case icon
+        case weatherDescription = "description"
+        case icon
     }
 }
 

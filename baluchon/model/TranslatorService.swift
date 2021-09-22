@@ -10,51 +10,30 @@ import Foundation
 class TranslatorService:UrlSessionCancelable,UrlBuildable{
     
     
-    //MARK : properties
+    //MARK: - properties
+    
     var currentLang = "FR"
-    let languageArray = [
-        ["name":"Bulgarian","short":"BG"],
-        ["name":"Czech","short":"CS"],
-        ["name":"Danish","short":"DA"],
-        ["name":"Dutch","short":"NL"],
-        ["name":"English (American)","short":"EN-US"],
-        ["name":"English (British)","short":"EN-GB"],
-        ["name":"Estonian (British)","short":"ET"],
-        ["name":"Finnish","short":"FI"],
-        ["name":"French","short":"FR"],
-        ["name":"German","short":"DE"],
-        ["name":"Greek","short":"EL"],
-        ["name":"Hungarian","short":"HU"],
-        ["name":"Italian","short":"IT"],
-        ["name":"Japanese","short":"JA"],
-        ["name":"Lithuanian","short":"LT"],
-        ["name":"Polish","short":"PL"],
-        ["name":"Portuguese (Brazilian)","short":"PT-BR"],
-        ["name":"Portuguese (European)","short":"PT-PT"],
-        ["name":"Romania","short":"RO"],
-        ["name":"Spanish","short":"SP"]
-    ]
-    var baseUrl:String = "https://api-free.deepl.com/v2/translate"
-   
+    var languageArray: [Target] = [(Target(language:"",name:""))]
     var lastUrl:URL = URL(string:"http://")!
     internal var  session : URLSession
     
-    //MARK : methods
+    //MARK: - methods
     
     init(session:URLSession = URLSession(configuration: .default)){
         self.session = session
-       
+        getLanguageList()
         
     }
     
+    // MARK: - Request to the API to ask for the translation in the selected language of the words passed in parameter
+    
     func translate( textToTranslate:String, callback: @escaping( Result<TranslatorResponse,NetworkError>)->Void) {
-        
-        let queryItem:[[String:String]] = [["name":"auth_key","value":"\(idKey)"],
+        let baseUrl:String = "https://api-free.deepl.com/v2/translate"
+        let queryItem:[[String:String]] = [["name":"auth_key","value":"\(ApiKey.deeple)"],
                                            ["name":"text","value":"\(textToTranslate)"],
                                            ["name":"target_lang","value":"\(currentLang)"]]
-       
-        guard let url = buildUrl(baseUrl:baseUrl,
-                                 Items:queryItem)  else{
+        
+        guard let url = buildUrl(baseUrl:baseUrl, Items:queryItem)  else{
             callback(.failure(.badUrl))
             return
             
@@ -69,9 +48,44 @@ class TranslatorService:UrlSessionCancelable,UrlBuildable{
         session.dataTask(with: url, callback: callback)
     }
     
+    
+    // MARK : -callBack function of the API call to get the list of available languages
+    
+    func getLanguageList() {
+        
+        targetLanguages(){ [ self] result in
+            DispatchQueue.main.async { [self] in
+                switch result {
+                case .success( let data):
+                    
+                    self.languageArray = data
+                    languageArray.sort{
+                        ((($0 ).name as? String)!) < ((($1 ).name as? String)!)
+                    }
+                    
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            
+        }
+    }
+    
+    // MARK: - Make a request to the API To obtain the list of available languages
+    
+    func targetLanguages(  callback: @escaping( Result<[Target],NetworkError>)->Void) {
+        let baseUrl:String = "https://api-free.deepl.com/v2/languages"
+        let queryItem:[[String:String]] = [["name":"auth_key","value":"\(ApiKey.deeple)"],
+        ]
+        
+        guard let url = buildUrl(baseUrl:baseUrl, Items:queryItem)  else{return }
+        print (url)
+        
+        session.dataTask(with: url, callback: callback)
+    }
 }
-
 // MARK: decodable struct
+
 struct Translation: Decodable {
     let detectedSourceLanguage: String
     let text : String
@@ -86,8 +100,24 @@ struct Translations: Decodable {
     let translations: [Translation]
     
 }
-// MARK: - TranslatorResponse Structure
+// MARK: - TranslatorResponse Struct
+
 struct TranslatorResponse: Decodable {
     let translations : [Translation]
     
 }
+
+// MARK: decodable struct for languages list
+
+struct Target: Decodable {
+    let language: String
+    let name : String
+    //    let supportsFormality:Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case language = "language"
+        case name = "name"
+        //        case supportsFormality = "supports_formality"
+    }
+}
+
