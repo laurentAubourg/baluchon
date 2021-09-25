@@ -7,20 +7,30 @@
 
 import UIKit
 
-class WeatherViewController: UIViewController {
+final class WeatherViewController: UIViewController {
+    
+    // MARK: - @IBOUTLETS
     
     @IBOutlet weak var tempMontreuilLabel: UILabel!
     @IBOutlet weak var tempNewYorkLabel: UILabel!
     @IBOutlet weak var iconWeatherMontreuilImage: UIImageView!
     @IBOutlet weak var iconWeatherNewYoykImage: UIImageView!
-  
     @IBOutlet weak var weatherDescriptionMontreuilLabel: UILabel!
     @IBOutlet weak var weatherDescriptionNewYorkLabel: UILabel!
+   
+    //MARK: - Properties
+    
     private let service:WeatherService = .init()
+    
+    //MARK: - Methods
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addGradient(gradientColors: [UIColor.black.cgColor,UIColor.blue.cgColor])
     }
+    
+    // MARK: - Request the weather from the OpenWeather API when displaying the view
+    
     override func viewWillAppear(_ animated: Bool) {
         getWeather()
     }
@@ -38,28 +48,35 @@ class WeatherViewController: UIViewController {
                    // print(iconeName(data:data, cityNumber:1))
                 
                 case .failure(let error):
-                    print(error)
+                    self?.presentAlert("The weather download failed.:\(error)")
                 }
             }
             
         })
-        // Do any additional setup after loading the view.
+      
     }
+    
+    //MARK: - Displays the weather status icon
+    
     private func  iconName(data:WeatherResponse, cityNumber:Int = 0)->String{
         guard  (data.list[cityNumber].weather[0].icon) != nil else{return "none"}
         return data.list[cityNumber].weather[0].icon!
     }
+    
+    //MARK: - Displays the weather status textual description under icon
+    
     private func  description(data:WeatherResponse, cityNumber:Int = 0)->String{
         guard  (data.list[cityNumber].weather[0].weatherDescription) != nil else{return "none"}
         return data.list[cityNumber].weather[0].weatherDescription!
     }
+    
+    //MARK: - Displays the temperature value
+    
     private func  Temperature(data:WeatherResponse, cityNumber:Int = 0)->String{
         
         return String(Int(data.list[cityNumber].main.temp) )
     }
-    func convertToCelsius(fahrenheit: Int) -> Int {
-        return Int(5.0 / 9.0 * (Double(fahrenheit) - 32.0))
-    }
+    
    
 
 }

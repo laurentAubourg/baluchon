@@ -7,28 +7,57 @@
 
 import UIKit
 
-class ConvertViewController: UIViewController,UITextFieldDelegate {
+final class ConvertViewController: UIViewController,UITextFieldDelegate {
     
+    //MARK: - @IBOUTLETS
     
     @IBOutlet weak var rateLabel: UILabel!
     @IBOutlet weak var valueInTextField: UITextField!
     
     @IBOutlet weak var valueOutLabel: UILabel!
-    private let service:CurrencyConverterService = .init()
+    
+    //MARK: - Properties
+    
+    private let service:CurrencyService = .init()
+    private var rate:Double = 0.0
+    //MARK: - Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addGradient(gradientColors: [UIColor.black.cgColor,UIColor.blue.cgColor])
     }
-    
-    func textserviceFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        
-        return true
+    override func viewWillAppear(_ animated: Bool) {
+       // getRate()
     }
     
+    // MARK: Make a call to the model to get the exchange rate
     
-    private func update(currencyVO: FixerResponse) {
+    private func getRate(){
+        service.getRate{  [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success( let data):
+                    self!.rate = data.rates.usd
+                    
+                case .failure( let error):
+                    self?.presentAlert("The rate download failed :\(error)")
+                } } }
+        
+    }
+    
+    //MARK: - Hides the keyboard when tapping on the view
+    
+    @IBAction func dismissKeyboard(_ sender: UITapGestureRecognizer) {
+        valueInTextField.resignFirstResponder()
+    }
+    
+    // MARK: - Calculates and displays the converted value in euro
+    
+    /* when text input change multiplies the value entered in euros by the exchange rate to obtain the value in dollars and displays it
+     */
+    
+    @IBAction func textChanged(_ sender: UITextField) {
+        
         guard !valueInTextField.text!.isEmpty else{
             self.valueOutLabel.text = "0"
             return
@@ -38,46 +67,8 @@ class ConvertViewController: UIViewController,UITextFieldDelegate {
             self.valueInTextField.text = ""
             self.valueOutLabel.text = "0"
             return}
-        let tempVar = Double(valIn) * currencyVO.rates.usd
-        self.rateLabel.text = " Rate: \(String(currencyVO.rates.usd))"
+        let tempVar = Double(valIn) * self.rate
+        self.rateLabel.text = " Rate: \(String(self.rate))"
         self.valueOutLabel.text = String(format: "%.2f", tempVar)
-    }
-    
-    private func presentAlert() {
-        let alertVC = UIAlertController(title: "Error", message: "The rate download failed.", preferredStyle: .alert)
-        alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-        present(alertVC, animated: true, completion: nil)
-    }
-    @IBAction func dismissKeyboard(_ sender: UITapGestureRecognizer) {
-        valueInTextField.resignFirstResponder()
-    }
-    @IBAction func textChanged(_ sender: UITextField) {
-        
-        service.getRate{  [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success( let data):
-                    print (data)
-                    self?.update(currencyVO: data)
-                case .failure(let error):
-                    print(error)
-                }
-            }
-            
-            
-        }
-        service.getRate{ result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success( let data):
-                    print (data)
-                    self.update(currencyVO: data)
-                case .failure(let error):
-                    print(error)
-                }
-            }
-            
-            
-        }
     }
 }

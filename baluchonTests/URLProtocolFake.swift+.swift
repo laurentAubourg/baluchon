@@ -22,7 +22,7 @@ class URLProtocolFake: URLProtocol {
     override func startLoading() {
         if let url = request.url {
             if let (data, response, error) = URLProtocolFake.fakeURLs[url] {
-              if let responseStrong = response {
+              if let responseStrong =  response{
                     client?.urlProtocol(self, didReceive: responseStrong, cacheStoragePolicy: .notAllowed)
                }
                 if let dataStrong = data {

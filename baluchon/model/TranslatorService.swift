@@ -7,21 +7,21 @@
 //
 import Foundation
 
-class TranslatorService:UrlSessionCancelable,UrlBuildable{
+final class TranslatorService:UrlSessionCancelable,UrlBuildable{
     
     
     //MARK: - properties
     
     var currentLang = "FR"
     var languageArray: [Target] = [(Target(language:"",name:""))]
-    var lastUrl:URL = URL(string:"http://")!
+    internal var lastUrl:URL = URL(string:"http://")!
     internal var  session : URLSession
     
     //MARK: - methods
     
     init(session:URLSession = URLSession(configuration: .default)){
         self.session = session
-        getLanguageList()
+      getLanguageList()
         
     }
     
@@ -33,11 +33,7 @@ class TranslatorService:UrlSessionCancelable,UrlBuildable{
                                            ["name":"text","value":"\(textToTranslate)"],
                                            ["name":"target_lang","value":"\(currentLang)"]]
         
-        guard let url = buildUrl(baseUrl:baseUrl, Items:queryItem)  else{
-            callback(.failure(.badUrl))
-            return
-            
-        }
+        guard let url = buildUrl(baseUrl:baseUrl, Items:queryItem)  else{return}
         guard lastUrl != URL(string:"http://")! else{
             session.dataTask(with: url, callback: callback)
             lastUrl = url
@@ -51,7 +47,7 @@ class TranslatorService:UrlSessionCancelable,UrlBuildable{
     
     // MARK : -callBack function of the API call to get the list of available languages
     
-    func getLanguageList() {
+    private  func getLanguageList() {
         
         targetLanguages(){ [ self] result in
             DispatchQueue.main.async { [self] in
@@ -60,7 +56,7 @@ class TranslatorService:UrlSessionCancelable,UrlBuildable{
                     
                     self.languageArray = data
                     languageArray.sort{
-                        ((($0 ).name as? String)!) < ((($1 ).name as? String)!)
+                        ((($0 ).name )) < ((($1 ).name ))
                     }
                     
                 case .failure(let error):
@@ -73,9 +69,10 @@ class TranslatorService:UrlSessionCancelable,UrlBuildable{
     
     // MARK: - Make a request to the API To obtain the list of available languages
     
-    func targetLanguages(  callback: @escaping( Result<[Target],NetworkError>)->Void) {
+    internal func targetLanguages(  callback: @escaping( Result<[Target],NetworkError>)->Void) {
         let baseUrl:String = "https://api-free.deepl.com/v2/languages"
         let queryItem:[[String:String]] = [["name":"auth_key","value":"\(ApiKey.deeple)"],
+                                           ["name":"type","value":"target"]
         ]
         
         guard let url = buildUrl(baseUrl:baseUrl, Items:queryItem)  else{return }
@@ -87,11 +84,11 @@ class TranslatorService:UrlSessionCancelable,UrlBuildable{
 // MARK: decodable struct
 
 struct Translation: Decodable {
-    let detectedSourceLanguage: String
+
     let text : String
     
     enum CodingKeys: String, CodingKey {
-        case detectedSourceLanguage = "detected_source_language"
+        
         case text = "text"
     }
 }
@@ -112,12 +109,12 @@ struct TranslatorResponse: Decodable {
 struct Target: Decodable {
     let language: String
     let name : String
-    //    let supportsFormality:Bool
+   
     
     enum CodingKeys: String, CodingKey {
         case language = "language"
         case name = "name"
-        //        case supportsFormality = "supports_formality"
+      
     }
 }
 

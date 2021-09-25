@@ -6,12 +6,12 @@
 //
 
 import Foundation
-class WeatherService:UrlSessionCancelable,UrlBuildable{
+final class WeatherService:UrlSessionCancelable,UrlBuildable{
     
     //MARK: - properties
     
-    var lastUrl:URL = URL(string:"http://")!
-    var baseUrl = "https://api.openweathermap.org/data/2.5/group"
+    internal var lastUrl:URL = URL(string:"http://")!
+    private var baseUrl = "https://api.openweathermap.org/data/2.5/group"
     internal var  session : URLSession
     
     //MARK: - methods
